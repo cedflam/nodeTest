@@ -1,0 +1,59 @@
+// Je récupère le paquet Express
+const express = require('express');
+// j'importe la méthode success de helper.js
+const {success, getUniqueId} = require('./helper');
+// J'importe la liste de pokemons
+let pokemons = require('./mock-pokemon');
+// J'importe le middleware favicon
+const favicon = require('serve-favicon');
+// J'importe le middleware Morgan
+const morgan = require('morgan');
+
+// Je crée une instance d'une application Express (Petit serveur web)
+const app = express();
+// Je définis une constante qui correspond au port
+const port = 3000;
+
+// Permet d'appeler le middleware
+// L'ordre est important !
+// Les middlewares récupérés via npm lance la méthode next() par défaut,
+// en revanche dans le cadre d'un middleware codé par nos soins la méthode next est nécessaire pour faire appel aux suivants
+app
+    .use(favicon(__dirname + '/favicon.ico'))
+    .use(morgan('dev'))
+;
+
+// 1) '/' -> Route
+// 2) req = request ... res = response
+app.get('/', (req, res) => res.send('Hello, Express 2 again !'));
+app.get('/api/pokemons/:id', (req, res) => {
+    //Permet de récupérer l'id passé dans l'URI grace à la propriété params
+    const id = parseInt(req.params.id);
+    // Je récupère le pokemon passé en paramètre
+    const pokemon = pokemons.find(pokemons => pokemons.id === id);
+    // Je configure le message du helper
+    const message = "Un pokémon a bien été trouvé !";
+    // Je retourne une réponse au format json contenant le message et le pokemon
+    res.json(success(message, pokemon));
+});
+// Retourne le nombre total de pokemons présent au format json
+app.get('/api/pokemons', (req, res) => {
+    const message = `Vous affichez actuellement ${pokemons.length} pokemons`;
+    res.json(success(message, pokemons));
+})
+// Permet de créer un nouveau pokemon
+app.post('/api/pokemons', (req, res) => {
+    // Appel de la méthode pour obtenir un id unique
+    const id = getUniqueId(pokemons);
+    // Ajoute le body de la requete...
+    const pokemonCreated = {...req.body, ...{id:id, created: new Date()}}
+    // J'ajoute le pokemon crée
+    pokemons.push(pokemonCreated);
+    // Je paramètre le message
+    const message = `Le pokemon ${pokemonCreated.name} a bien été crée !`;
+    // Je retourne une réponse au format json
+    res.json(success(message, pokemonCreated));
+
+})
+// Je démarre l'api rest sur le port 3000 que je lance grace à la méthode listen
+app.listen(port, () => console.log(`Notre application Node est démarrée sur : http://localhost: ${port}`));
