@@ -8,6 +8,8 @@ let pokemons = require('./mock-pokemon');
 const favicon = require('serve-favicon');
 // J'importe le middleware Morgan
 const morgan = require('morgan');
+// J'importe le middleware body-parser
+const bodyParser = require('body-parser');
 
 // Je crée une instance d'une application Express (Petit serveur web)
 const app = express();
@@ -21,6 +23,7 @@ const port = 3000;
 app
     .use(favicon(__dirname + '/favicon.ico'))
     .use(morgan('dev'))
+    .use(bodyParser.json())
 ;
 
 // 1) '/' -> Route
@@ -45,7 +48,7 @@ app.get('/api/pokemons', (req, res) => {
 app.post('/api/pokemons', (req, res) => {
     // Appel de la méthode pour obtenir un id unique
     const id = getUniqueId(pokemons);
-    // Ajoute le body de la requete...
+    // Ajoute le body de la requete...(id et created sont entre accolades car je passe 2 éléments )
     const pokemonCreated = {...req.body, ...{id:id, created: new Date()}}
     // J'ajoute le pokemon crée
     pokemons.push(pokemonCreated);
@@ -53,7 +56,31 @@ app.post('/api/pokemons', (req, res) => {
     const message = `Le pokemon ${pokemonCreated.name} a bien été crée !`;
     // Je retourne une réponse au format json
     res.json(success(message, pokemonCreated));
-
 })
+
+// Permet de modifier un pokemon
+app.put('/api/pokemons', (req, res) => {
+    //j'obtiens un id unique
+    const id = getUniqueId(pokemons);
+    // J'ajoute le body de la requete
+    const pokemonUpdated = {... req.body, id:id};
+    // Pour chaque élément de la liste, je retourne un pokemon sauf q'il s'agit du pokemon modifié
+    pokemons = pokemons.map(pokemon => {
+        return pokemon.id === id ? pokemonUpdated : pokemon
+    });
+    // Je paramètre le message
+    const message = `Le pokemon ${pokemonUpdated.name} a bien été mis à jour !`;
+    // Je retourne une réponse au format json
+    res.json(success(message, pokemonUpdated));
+});
+
+// Permet de supprimer un pokemon
+app.delete('/api/pokemons/:id', (req, res) => {
+   const id = parseInt(req.params.id);
+   const pokemonDelete = pokemons.find(pokemon => pokemon.id === id);
+   pokemons.filter(pokemon => pokemon.id !== id);
+   const message = `Le pokemon ${pokemonDelete.name} a bien été supprimé !`;
+   res.json(success(message, pokemonDelete));
+});
 // Je démarre l'api rest sur le port 3000 que je lance grace à la méthode listen
 app.listen(port, () => console.log(`Notre application Node est démarrée sur : http://localhost: ${port}`));
