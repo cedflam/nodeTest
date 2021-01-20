@@ -10,11 +10,28 @@ const favicon = require('serve-favicon');
 const morgan = require('morgan');
 // J'importe le middleware body-parser
 const bodyParser = require('body-parser');
+// J'importe sequelize
+const {Sequelize} = require("sequelize");
 
 // Je crée une instance d'une application Express (Petit serveur web)
 const app = express();
 // Je définis une constante qui correspond au port
 const port = 3000;
+
+// Je paramètre sequelize
+const sequelize = new Sequelize('pokedex', 'root', '', {
+    host: 'localhost',
+    dialect: 'mariadb',
+    dialectOptions: {
+        timezone: 'Etc/GMT-2',
+    },
+    logging: false
+})
+
+// Initialisation de la base de données
+sequelize.authenticate()
+    .then(_ => console.log("La connexion a bien été prise en compte..."))
+    .catch(error => console.log(`La connexion à la base de données à échoué ... ${error}`))
 
 // Permet d'appeler le middleware
 // L'ordre est important !
