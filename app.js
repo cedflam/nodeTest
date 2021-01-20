@@ -19,6 +19,15 @@ const app = express();
 const port = 3000;
 
 // Je paramètre sequelize
+// npm install --save mysql2
+/**
+*const sequelize = new Sequelize('database', 'username', 'password', {
+  dialect: 'mysql',
+  dialectOptions: {
+    // Your mysql2 options here
+  }
+})
+*/
 const sequelize = new Sequelize('pokedex', 'root', '', {
     host: 'localhost',
     dialect: 'mariadb',
@@ -27,6 +36,8 @@ const sequelize = new Sequelize('pokedex', 'root', '', {
     },
     logging: false
 })
+
+
 
 // Initialisation de la base de données
 sequelize.authenticate()
