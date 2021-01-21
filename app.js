@@ -43,8 +43,7 @@ const sequelize = new Sequelize('pokedex', 'root', 'root', {
     logging: false
 })*/
 
-
-// Initialisation de la base de données
+// Initialisation de la base de données et de l'ORM
 sequelize.authenticate()
     .then(_ => console.log("La connexion à la base de données a bien été prise en compte..."))
     .catch(error => console.log(`La connexion à la base de données à échoué ... ${error}`))
