@@ -24,8 +24,22 @@ app
     .use(bodyParser.json())
 ;
 
+// Initialisation de la base de données
+sequelize.initDb();
+
 // Ici j'insère mes routes
 require('./src/routes/findAllPokemons')(app);
+require('./src/routes/findPokemonByPk')(app);
+require('./src/routes/createPokemon')(app);
+require('./src/routes/updatePokemon')(app);
+require('./src/routes/deletePokemon')(app);
+require('./src/routes/login')(app);
+
+// Gestion des erreurs
+app.use( ( {res} ) => {
+    const message = "Impossible de trouver la ressource demandée ! Vous pouvez essayer une autre URL. ";
+    res.status(404).json({message});
+})
 
 // Je démarre l'api rest sur le port 3000 que je lance grace à la méthode listen
 app.listen(port, () => console.log(`Notre application Node est démarrée sur : http://localhost: ${port}`));
