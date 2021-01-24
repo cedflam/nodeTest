@@ -51,7 +51,7 @@ const initDb = () => {
                     password: hash
                 })
             })
-            .then(user => console.log(user.toJSON()))
+            .then(user => console.log(user))
         console.log('La base de donnée a bien été initialisée !')
     })
 }
